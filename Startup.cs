@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
-
+using api.Abstractions;
+using api.Repositories;
 namespace api
 {
     public class Startup
@@ -16,7 +17,8 @@ namespace api
         {
             services.AddControllers();
             services.AddSignalR();
-
+            services.AddSingleton<IBookRepository, BookRepository>();
+            services.AddSingleton<IPublisherRepository, PublisherRepository>();
 
             services.AddCors(options =>
             {

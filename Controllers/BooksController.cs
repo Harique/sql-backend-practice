@@ -1,8 +1,7 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using api.Library;
-using api.Library.Context;
+using api.Abstractions;
 
 namespace api.BooksController
 {
@@ -12,50 +11,71 @@ namespace api.BooksController
 
     public class BooksController : ControllerBase
     {
-        public BooksController()
+        private readonly IBookRepository _bookrepo;
+        private readonly IPublisherRepository _publisherrepo;
+        public BooksController(IBookRepository bookRepository, IPublisherRepository publisherRepository)
         {
-
+            _bookrepo = bookRepository;
+            _publisherrepo = publisherRepository;
         }
 
         [HttpPost]
-        public void addBook([FromBody] Book book)
+        public async Task addBook([FromBody] Book book)
         {
-            Console.WriteLine("hit the controller");
             try
             {
-                using (var context = new LibraryContext())
+                var publisher = new Publisher
                 {
+                    Name = book.Publisher.Name,
 
-                    // Creates the database if not exists
-                    context.Database.EnsureCreated();
-                    /*var publisher = new Publisher
-                    {
-                        
-                    };
-                    context.Publisher.Add(publisher);*/
+                };
 
-                    context.Book.Add(new Book
-                    {
-                        ISBN = book.ISBN,
-                        Title = book.Title,
-                        Author = book.Author,
-                        Language = book.Language,
-                        Pages = book.Pages,
-                        Publisher = book.Publisher
-                    });
-                    context.SaveChanges();
+                Book Book = new Book
+                {
+                    ISBN = book.ISBN,
+                    Title = book.Title,
+                    Author = book.Author,
+                    Language = book.Language,
+                    Pages = book.Pages,
+                    Publisher = publisher
+                };
 
-                }
+                await _bookrepo.insertBook(Book);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+        [HttpDelete("{title}")]
+        public async Task deleteBook([FromRoute] string title)
+        {
+            try
+            {
+                await _bookrepo.deleteBook(title);
             }
             catch (Exception e)
             {
 
                 Console.WriteLine(e.ToString());
+
             }
 
-
-
         }
+        [HttpPatch("{newTitle}")]
+        public async Task updateBookTitle([FromBody]Book book,[FromRoute] string newTitle)
+        {
+            try
+            {
+                await _bookrepo.updateBookTitle(book.Title,newTitle);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+
     }
 }
 

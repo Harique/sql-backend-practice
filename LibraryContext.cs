@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using MySql.EntityFrameworkCore.Extensions;
-using api.Library;
 
 namespace api.Library.Context
 {
@@ -31,7 +29,8 @@ namespace api.Library.Context
             {
                 entity.HasKey(e => e.ISBN);
                 entity.Property(e => e.Title).IsRequired();
-                entity.HasOne(d => d.Publisher).WithMany(p => p.Books);
+                entity.HasOne(d => d.Publisher)
+                .WithMany(p => p.Books);
             });
         }
     }
