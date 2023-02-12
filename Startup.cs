@@ -19,6 +19,7 @@ namespace api
             services.AddSignalR();
             services.AddSingleton<IBookRepository, BookRepository>();
             services.AddSingleton<IPublisherRepository, PublisherRepository>();
+            services.AddSingleton<IMemberRepository,MemberRepository>();
 
             services.AddCors(options =>
             {

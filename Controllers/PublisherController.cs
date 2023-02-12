@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using api.Abstractions;
-using api.Library;
+using api.Library.Models;
 
 namespace api.Controllers
 {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using api.Library;
+using api.Library.Models;
+using api.Library.Models.DTO;
 using api.Abstractions;
 
 namespace api.BooksController
@@ -13,10 +14,12 @@ namespace api.BooksController
     {
         private readonly IBookRepository _bookrepo;
         private readonly IPublisherRepository _publisherrepo;
-        public BooksController(IBookRepository bookRepository, IPublisherRepository publisherRepository)
+        private readonly IMemberRepository _memberrepo;
+        public BooksController(IMemberRepository memberRepository,IBookRepository bookRepository, IPublisherRepository publisherRepository)
         {
             _bookrepo = bookRepository;
             _publisherrepo = publisherRepository;
+            _memberrepo = memberRepository;
         }
 
         [HttpPost]
@@ -48,6 +51,23 @@ namespace api.BooksController
                 Console.WriteLine(e.ToString());
             }
         }
+        [HttpPost("rent")]
+        public async Task addRentedBook([FromBody] Rental_Info info)
+        {
+            try
+            {
+                var bookId = await _bookrepo.getBookID(info.Title);
+                var memberId = await _memberrepo.getMemberID(info.MemberName);
+
+                await _bookrepo.addRentedBook(bookId,memberId);
+            }
+            catch (Exception e)
+            {
+                
+                Console.WriteLine(e.ToString());
+                
+            }
+        }
         [HttpDelete("{title}")]
         public async Task deleteBook([FromRoute] string title)
         {
@@ -64,11 +84,11 @@ namespace api.BooksController
 
         }
         [HttpPatch("{newTitle}")]
-        public async Task updateBookTitle([FromBody]Book book,[FromRoute] string newTitle)
+        public async Task updateBookTitle([FromBody] Book book, [FromRoute] string newTitle)
         {
             try
             {
-                await _bookrepo.updateBookTitle(book.Title,newTitle);
+                await _bookrepo.updateBookTitle(book.Title, newTitle);
             }
             catch (Exception e)
             {
